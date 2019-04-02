@@ -374,7 +374,7 @@ function getAnimationListener(): android.animation.Animator.AnimatorListener {
 
     return AnimationListener;
 }
- 
+
 function addToWaitingQueue(entry: ExpandedEntry): void {
     const frameId = entry.frameId;
     let entries = waitingQueue.get(frameId);
@@ -659,7 +659,7 @@ function setupAllAnimation(entry: ExpandedEntry, transition: Transition): void {
     setupExitAndPopEnterAnimation(entry, transition);
     const listener = getAnimationListener();
 
-    // setupAllAnimation is called only for new fragments so we don't 
+    // setupAllAnimation is called only for new fragments so we don't
     // need to clearAnimationListener for enter & popExit animators.
     const enterAnimator = <ExpandedAnimator>transition.createAndroidAnimator(AndroidTransitionType.enter);
     enterAnimator.transitionType = AndroidTransitionType.enter;
@@ -674,7 +674,7 @@ function setupAllAnimation(entry: ExpandedEntry, transition: Transition): void {
     entry.popExitAnimator = popExitAnimator;
 }
 
-function setupDefaultAnimations(entry: ExpandedEntry, transition: Transition): void {
+export function setupDefaultAnimations(entry: ExpandedEntry, transition: Transition): void {
     const listener = getAnimationListener();
 
     const enterAnimator = <ExpandedAnimator>transition.createAndroidAnimator(AndroidTransitionType.enter);
@@ -720,7 +720,7 @@ function transitionOrAnimationCompleted(entry: ExpandedEntry): void {
     if (entries.size === 0) {
         const frame = entry.resolvedPage.frame;
         // We have 0 or 1 entry per frameId in completedEntries
-        // So there is no need to make it to Set like waitingQueue 
+        // So there is no need to make it to Set like waitingQueue
         const previousCompletedAnimationEntry = completedEntries.get(frameId);
         completedEntries.delete(frameId);
         waitingQueue.delete(frameId);

@@ -3,6 +3,7 @@
  */ /** */
 
 import { NavigationTransition, BackstackEntry } from "../frame";
+import { Transition } from "../transition/transition";
 
 //@private
 /**
@@ -64,3 +65,5 @@ export function _clearFragment(entry: BackstackEntry): void;
  */
 export function _createIOSAnimatedTransitioning(navigationTransition: NavigationTransition, nativeCurve: any, operation: number, fromVC: any, toVC: any): any;
 //@endprivate
+
+export function setupDefaultAnimations(entry: BackstackEntry, transition: Transition): void;

@@ -14,6 +14,7 @@ export * from "../page";
  * Nested frames are supported, enabling hierarchical navigation scenarios.
  */
 export class Frame extends View {
+    // createFragment(backstackEntry: BackstackEntry, fragmentTag: string): any; //android.support.v4.app.Fragment {
     /**
      * @deprecated
      *
@@ -61,7 +62,7 @@ export class Frame extends View {
      * Used to control the visibility the Navigation Bar in iOS and the Action Bar in Android.
      */
     public actionBarVisibility: "auto" | "never" | "always";
-
+    // containerViewId: any;
     /**
      * Gets the back stack of this instance.
      */
@@ -113,6 +114,7 @@ export class Frame extends View {
      * @param entry to check
      */
     isCurrent(entry: BackstackEntry): boolean;
+    // createFragment(backstackEntry: BackstackEntry, fragmentTag: string): any;
     /**
      * @private
      * @param entry to set as current
@@ -371,6 +373,7 @@ export interface AndroidOptionEventData extends EventData {
  * To start a new Activity, a new Frame instance should be created and navigated to the desired Page.
  */
 export interface AndroidFrame extends Observable {
+    // frameId: number;
     /**
      * Gets the native [android ViewGroup](http://developer.android.com/reference/android/view/ViewGroup.html) instance that represents the root layout part of the Frame.
      */
@@ -408,6 +411,7 @@ export interface AndroidFrame extends Observable {
      * @param page The Page instance to search for.
      */
     fragmentForPage(entry: BackstackEntry): any;
+
 }
 
 export interface AndroidActivityCallbacks {

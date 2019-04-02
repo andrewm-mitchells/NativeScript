@@ -1,6 +1,6 @@
 ﻿// Definitions.
 import {
-    AndroidFrame as AndroidFrameDefinition, BackstackEntry,
+    AndroidFrame as AndroidFrameDefinition, BackstackEntry, NavigationEntry,
     NavigationTransition, AndroidFragmentCallbacks, AndroidActivityCallbacks
 } from ".";
 import { Page } from "../page";
@@ -14,9 +14,11 @@ import {
 
 import {
     _setAndroidFragmentTransitions, _onFragmentCreateAnimator, _getAnimatedEntries,
-    _updateTransitions, _reverseTransitions, _clearEntry, _clearFragment, AnimationType
+    _updateTransitions, _reverseTransitions, _clearEntry, _clearFragment, AnimationType,
+    setupDefaultAnimations
 } from "./fragment.transitions";
 
+import { FadeTransition } from "../transition/fade-transition";
 import { profile } from "../../profiling";
 
 // TODO: Remove this and get it from global to decouple builder for angular
@@ -328,6 +330,64 @@ export class Frame extends FrameBase {
         }
 
         return false;
+    }
+
+    public _onLivesync(context?: ModuleContext): boolean {
+        // TODO(vchimev)
+        console.log("---> Frame._onLivesync", context);
+        if (!this._currentEntry || !this._currentEntry.entry) {
+            return false;
+        }
+
+        const currentBackstackEntry: BackstackEntry = this._currentEntry;
+        const currentNavigationEntry: NavigationEntry = currentBackstackEntry.entry;
+
+        if (context && context.type && context.path) {
+            // TODO(vchimev): moduleName
+            const viewFromEntry = <Page>createViewFromEntry({ moduleName: context.path.substr(2, context.path.length - 6) });
+            const fragmentTag = `fragment${fragmentId}[${navDepth}]`;
+            const backstackEntry: BackstackEntry = {
+                entry: currentNavigationEntry,
+                resolvedPage: viewFromEntry,
+                navDepth: currentBackstackEntry.navDepth,
+                fragmentTag: fragmentTag,
+                frameId: currentBackstackEntry.frameId
+            }
+
+            this._cachedAnimatorState = getAnimatorState(this._currentEntry);
+            restoreAnimatorState(backstackEntry, this._cachedAnimatorState);
+            this._currentEntry = backstackEntry;
+
+            const fragment = this.createFragment(backstackEntry, fragmentTag);
+            const fragmentManager = this._getFragmentManager();
+            const transaction = fragmentManager.beginTransaction()
+            transaction.replace(this.containerViewId, fragment, fragmentTag);
+            transaction.commitAllowingStateLoss();
+        } else {
+            // Fallback
+            const navigationEntry: NavigationEntry = {
+                animated: false,
+                clearHistory: true,
+                context: currentNavigationEntry.context,
+                create: currentNavigationEntry.create,
+                moduleName: currentNavigationEntry.moduleName,
+                backstackVisible: currentNavigationEntry.backstackVisible
+            }
+
+            // If create returns the same page instance we can't recreate it.
+            // Instead of navigation set activity content.
+            // This could happen if current page was set in XML as a Page instance.
+            if (navigationEntry.create) {
+                const page = navigationEntry.create();
+                if (page === this.currentPage) {
+                    return false;
+                }
+            }
+
+            this.navigate(navigationEntry);
+        }
+
+        return true;
     }
 
     @profile
